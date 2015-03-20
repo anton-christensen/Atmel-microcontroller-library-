@@ -306,10 +306,10 @@ void timer1_set_output_compareA_mode(int ocA16_mode) {
 }
 void timer1_set_output_compareB_mode(int ocB16_mode) {
 	switch(ocB16_mode%4) {
-		case NON_PWM16_NORMAL: 		TCCR1B &= ~(1<<COM1B1 | 1<<COM1B0); break;
-		case NON_PWM16_OC_TOGGLE: 	TCCR1B &= ~(1<<COM1B1); TCCR1B |=   1<<COM1B0;  break;
-		case NON_PWM16_OC_CLEAR: 	TCCR1B |=   1<<COM1B1;  TCCR1B &= ~(1<<COM1B0); break;
-		case NON_PWM16_OC_SET: 		TCCR1B |=   1<<COM1B1 | 1<<COM1B0;  break;
+		case NON_PWM16_NORMAL: 		TCCR1A &= ~(1<<COM1B1 | 1<<COM1B0); break;
+		case NON_PWM16_OC_TOGGLE: 	TCCR1A &= ~(1<<COM1B1); TCCR1A |=   1<<COM1B0;  break;
+		case NON_PWM16_OC_CLEAR: 	TCCR1A |=   1<<COM1B1;  TCCR1A &= ~(1<<COM1B0); break;
+		case NON_PWM16_OC_SET: 		TCCR1A |=   1<<COM1B1 | 1<<COM1B0;  break;
 	}
 }
 void timer2_set_output_compare_mode(int oc_mode) {

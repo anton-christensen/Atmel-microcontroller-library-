@@ -1,9 +1,12 @@
 #ifndef __AFTER_INIT__
 #define __AFTER_INIT__
 
-#include "lcd.h"
+#include "../aatg/lcd.h"
 
-const char Aini0[] = { 0b00000,
+void Splash(); // Run this function to start the splash screen
+
+const unsigned char Aini0[] = {
+ 					0b00000,
 					0b00000,
 					0b00000,
 					0b00100, ///   #
@@ -12,7 +15,8 @@ const char Aini0[] = { 0b00000,
 					0b00000,
 					0b00000};
 					
-const char Aini1[] = { 0b00000,
+const unsigned char Aini1[] = { 
+					0b00000,
 					0b00000,
 					0b00010, ///    #
 					0b10100, /// # #
@@ -21,7 +25,8 @@ const char Aini1[] = { 0b00000,
 					0b01000, ///  #
 					0b00000};
 
-const char Aini2[] = { 0b00000,
+const unsigned char Aini2[] = { 
+					0b00000,
 					0b00000,
 					0b00010, ///    #
 					0b11110, /// ####
@@ -30,7 +35,8 @@ const char Aini2[] = { 0b00000,
 					0b01000, ///  #
 					0b00000};
 
-const char Aini3[] = { 0b00000,
+const unsigned char Aini3[] = { 
+					0b00000,
 					0b00000,
 					0b01100, ///  ##
 					0b01111, ///  ####
@@ -39,7 +45,8 @@ const char Aini3[] = { 0b00000,
 					0b00110, ///   ##
 					0b00000};
 
-const char Aini4[] = { 0b00000,
+const unsigned char Aini4[] = { 
+					0b00000,
 					0b00000,
 					0b00010, ///    #
 					0b11110, /// ####
@@ -48,7 +55,8 @@ const char Aini4[] = { 0b00000,
 					0b01000, ///  #
 					0b00000};
 
-const char Aini5[] = { 0b00000,
+const unsigned char Aini5[] = { 
+					0b00000,
 					0b00000,
 					0b00000,
 					0b00000,
@@ -57,7 +65,8 @@ const char Aini5[] = { 0b00000,
 					0b00000,
 					0b00000};
 
-const char Aini6[] = { 0b00000,
+const unsigned char Aini6[] = { 
+					0b00000,
 					0b00000,
 					0b00000,
 					0b00000,
@@ -66,7 +75,8 @@ const char Aini6[] = { 0b00000,
 					0b00000,
 					0b00000};
 
-const char Aini7[] = { 0b00000,
+const unsigned char Aini7[] = { 
+					0b00000,
 					0b00000,
 					0b00000,
 					0b00000,
@@ -87,6 +97,9 @@ struct animStep createStep(int sprite, int posx, int posy) {
 }
 
 void Splash() {
+
+	lcd_init();
+	
 	struct animStep anim[16];
 	char name[3];
 
@@ -119,6 +132,7 @@ void Splash() {
 	name[0] = 'D';
 	name[1] = 'L';
 	name[2] = 'L';
+
 
 	for(i = 0; i < animLength; i++) {
 		if(i == 6) {

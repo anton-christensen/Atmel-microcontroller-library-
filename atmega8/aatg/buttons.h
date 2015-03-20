@@ -6,7 +6,7 @@
   * 
   * Description: 
   * 	Functionality for using the button board 
-  * 	connected to 
+  * 	connected to an AVR
   *
   */
 
@@ -17,7 +17,7 @@
 
 #define BUTTONPIN PIND
 
-char isPressed(int pin) {
+char is_pressed(int pin) {
 	return ~BUTTONPIN & 1<<pin;
 }
 
