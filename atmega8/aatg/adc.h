@@ -29,7 +29,7 @@ unsigned int adc_read(char pin_select); // read value from ADC input on pin #pin
 
 
 // enable adc, set auto trigger enable and set prescaler 16 (1/16 f system clock as sample rate)
-void adc_enable()  {ADCSRA |=  1<<ADEN | 1<<ADATE | 1<<ADPS2;}
+void adc_enable()  {ADCSRA |=  1<<ADEN /*| 1<<ADATE*/ | 1<<ADPS2;}
 void adc_disable() {ADCSRA &= ~1<<ADEN;}
 
 void adc_set_ref(char refference_mode) {
@@ -41,7 +41,7 @@ void adc_set_ref(char refference_mode) {
 
 unsigned int adc_read(char pin_select) {
 	pin_select %= 8;
-	ADMUX &= 0b11100000; 				// Clear the pin select register 
+	ADMUX &= 0b11110000; 				// Clear the pin select register 
 	ADMUX |= pin_select; 				// Set pin to read from (single ended mode) 
 	_delay_us(100); 						// Delay needed for the stabilization of the ADC input voltage
 	ADCSRA|=(1<<ADSC); 					// Initiates the conversion of selected AD pin

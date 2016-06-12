@@ -48,8 +48,8 @@
 #define INDEX_USART_RXC		9  // recieve complete usart
 #define INDEX_USART_DRE		10 // usart data registry empty
 #define INDEX_USART_TXC		11 // transmit complete usart
-#define INDEX_INT2			12 // External interrupt 1
-#define INDEX_TIMER0_OC		13 // timer0 output compare match
+// #define INDEX_INT2		12 // External interrupt 1
+//#define INDEX_TIMER0_OC	13 // timer0 output compare match
 
 
 
@@ -61,12 +61,9 @@ void enable_global_interrupts();				// Enables interrupts. Will stay enabled unt
 
 void int0_init(char edge, pVoidFunc interrupt_function); // Initializes interrupt-0 (PIN D2)
 void int1_init(char edge, pVoidFunc interrupt_function); // Initializes interrupt-1 (PIN D3)
-void int2_init(char edge, pVoidFunc interrupt_function); // Initializes interrupt-1 (PIN B2) OBS! - ONLY FALLING OR RISING EDGE AVAILABLE
 
 void int0_enable(); 							// Enables external interrupt 0. OBS! Does not enable global interrupt flag! call enable_interrupts() for this.
 void int1_enable();								// Enables external interrupt 1. OBS! Does not enable global interrupt flag! call enable_interrupts() for this.
-void int2_enable();								// Enables external interrupt 2. OBS! Does not enable global interrupt flag! call enable_interrupts() for this.
-void timer0_output_compare_interrupt_enable(); 	// Enables timer0's Output Compare Match interrupt. 	OBS! Does not set interrupt function OBS! Does not enable global interrupt flag! call enable_interrupts() for this.
 void timer0_overflow_interrupt_enable();		// Enables timer0's clock Overflow interrupt. 			OBS! Does not set interrupt function OBS! Does not enable global interrupt flag! call enable_interrupts() for this.
 void timer1_input_capture_interrupt_enable();	// Enables timer1's Input Capture interrupt. 			OBS! Does not set interrupt function OBS! Does not enable global interrupt flag! call enable_interrupts() for this.
 void timer1_output_compareA_interrupt_enable();	// Enables timer1's 'A' Output Compare Match interrupt. OBS! Does not set interrupt function OBS! Does not enable global interrupt flag! call enable_interrupts() for this.
@@ -80,8 +77,6 @@ void usart_data_reg_empty_interrupt_enable();
 
 void int0_disable();							// Disables external interrupt 0 but remembers interrupt function adress and sense control setting
 void int1_disable();							// Disables external interrupt 1 but remembers interrupt function adress and sense control setting
-void int2_disable();							// Disables external interrupt 2 but remembers interrupt function adress and sense control setting
-void timer0_output_compare_interrupt_disable(); // Disables timer0's Output Compare Match interrupt
 void timer0_overflow_interrupt_disable();		// Disables timer0's clock Overflow interrupt.
 void timer1_input_capture_interrupt_disable();
 void timer1_output_compareA_interrupt_disable();
@@ -95,12 +90,9 @@ void usart_data_reg_empty_disable();
 
 void int0_set_edge(char edge);				// Sets edge of external interrupt 0
 void int1_set_edge(char edge);				// Sets edge of external interrupt 1
-void int2_set_edge(char edge);				// Sets edge of external interrupt 2. ONLY RISING AND FALLING EDGE AVAILABLE
 
 void int0_set_function(pVoidFunc func);				// Sets function to call when interrupt is triggered by INT0
 void int1_set_function(pVoidFunc func);				// Sets function to call when interrupt is triggered by INT1
-void int2_set_function(pVoidFunc func);				// Sets function to call when interrupt is triggered by INT2
-void timer0_set_output_compare_interrupt_function(pVoidFunc func); 	// Sets function to call when interrupt is triggered by output compare match
 void timer0_set_overflow_interrupt_function(pVoidFunc func); 		// Sets function to call when interrupt is triggered by clock overflow
 void timer1_set_input_capture_interrupt_function(pVoidFunc func);
 void timer1_set_output_compareA_interrupt_function(pVoidFunc func);
@@ -124,8 +116,6 @@ void usart_set_data_reg_empty_interrupt_function(pVoidFunc func);
 	 ISR(USART_RXC_vect);					// FOR INTERNAL USE ONLY!
 	 ISR(USART_UDRE_vect);					// FOR INTERNAL USE ONLY!
 	 ISR(USART_TXC_vect);					// FOR INTERNAL USE ONLY!
-	 ISR(INT2_vect);						// FOR INTERNAL USE ONLY! 
-	 ISR(TIMER0_COMP_vect);					// FOR INTERNAL USE ONLY! 
 
 // Abbreviations table
 /////////////////////////////////////////////
@@ -167,19 +157,10 @@ void int1_init(char edge, pVoidFunc interrupt_function) {
 	DDRD &= ~(1<<INT1); 			// set Data direction for pin D3 to input
 	SREG  =   1<<7;					// Set Global Interrupt Enable bit
 }
-void int2_init(char edge, pVoidFunc interrupt_function) {
-	int2_set_function(interrupt_function);
-	int2_enable();
-	int2_set_edge(edge);
-	DDRB &= ~(1<<INT2); 			// set Data direction for pin D3 to input
-	SREG  =   1<<7;					// Set Global Interrupt Enable bit
-}
 
 
 void int0_enable()  							{GICR  |=  1<<INT0;}
 void int1_enable()  							{GICR  |=  1<<INT1;}
-void int2_enable()  							{GICR  |=  1<<INT2;}
-void timer0_output_compare_interrupt_enable() 	{TIMSK |=  1<<OCIE0;}
 void timer0_overflow_interrupt_enable() 		{TIMSK |=  1<<TOIE0;}
 void timer1_input_capture_interrupt_enable()	{TIMSK |=  1<<TICIE1;}
 void timer1_output_compareA_interrupt_enable()	{TIMSK |=  1<<OCIE1A;}
@@ -194,8 +175,6 @@ void usart_data_reg_empty_interrupt_enable()	{UCSRB |=  1<<UDRIE;}
 
 void int0_disable() 							{GICR  &= ~1<<INT0;}
 void int1_disable() 							{GICR  &= ~1<<INT1;}
-void int2_disable() 							{GICR  &= ~1<<INT2;}
-void timer0_output_compare_interrupt_disable() 	{TIMSK &= ~1<<OCIE0;}
 void timer0_overflow_interrupt_disable()		{TIMSK &= ~1<<TOIE0;}
 void timer1_input_capture_interrupt_disable()	{TIMSK &= ~1<<TICIE1;}
 void timer1_output_compareA_interrupt_disable()	{TIMSK &= ~1<<OCIE1A;}
@@ -245,28 +224,12 @@ void int1_set_edge(char edge) {
 			break;
 	}
 }
-void int2_set_edge(char edge) {
-	switch(edge) {					// Set MCUCSR (MCU Control and Status Register)
-		case RISING_EDGE:			// Set to interrupt on rising edge
-			MCUCSR |=   1<<ISC2;
-			break;
-		case FALLING_EDGE:			// Set to interrupt on falling edge
-			MCUCSR &= ~(1<<ISC2); 
-			break;
-	}
-}
 
 void int0_set_function(pVoidFunc func) {
 	INTERRUPT_CALLFUNCTION[INDEX_INT0] = func; // assign void function to call on interrupt
 }
 void int1_set_function(pVoidFunc func) {
 	INTERRUPT_CALLFUNCTION[INDEX_INT1] = func; // assign void function to call on interrupt
-}
-void int2_set_function(pVoidFunc func) {
-	INTERRUPT_CALLFUNCTION[INDEX_INT2] = func; // assign void function to call on interrupt
-}
-void timer0_set_output_compare_interrupt_function(pVoidFunc func) {
-	INTERRUPT_CALLFUNCTION[INDEX_TIMER0_OC] = func; // assign void function to call on interrupt
 }
 void timer0_set_overflow_interrupt_function(pVoidFunc func) {
 	INTERRUPT_CALLFUNCTION[INDEX_TIMER0_OF] = func; // assign void function to call on interrupt
@@ -313,7 +276,5 @@ ISR(TIMER0_OVF_vect) {		INTERRUPT_CALLFUNCTION[INDEX_TIMER0_OF](); }
 ISR(USART_RXC_vect) {		INTERRUPT_CALLFUNCTION[INDEX_USART_RXC](); }
 ISR(USART_UDRE_vect) {		INTERRUPT_CALLFUNCTION[INDEX_USART_DRE](); }
 ISR(USART_TXC_vect) {		INTERRUPT_CALLFUNCTION[INDEX_USART_TXC](); }
-ISR(INT2_vect){				INTERRUPT_CALLFUNCTION[INDEX_INT2](); }
-ISR(TIMER0_COMP_vect){		INTERRUPT_CALLFUNCTION[INDEX_TIMER0_OC](); }
 
 #endif

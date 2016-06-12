@@ -19,7 +19,7 @@
 #ifndef __AATG_SERIAL__
 #define __AATG_SERIAL__
 
-#define BAUD 9600
+#define BAUD 38400
 
 #include <avr/io.h>
 #include <util/setbaud.h>

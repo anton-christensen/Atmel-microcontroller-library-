@@ -1,4 +1,4 @@
- /** 
+  /** 
   * File:    serial.h 
   * 
   * Author:  Anton Christensen (anton.christensen9700@gmail.com)
@@ -25,8 +25,8 @@
 #include <util/setbaud.h>
 #include <stdio.h>
  
-//#define MCP2200_UBBR F_CPU/16/BAUD-1
- 
+#define MCP2200_UBBR F_CPU/16/BAUD-1
+
 void usart_init();
 char _usart_getchar(FILE* stream); 
 void _usart_putchar(char data, FILE* stream);
@@ -35,25 +35,25 @@ FILE usart_output = FDEV_SETUP_STREAM(_usart_putchar, NULL, _FDEV_SETUP_WRITE);
 FILE usart_input  = FDEV_SETUP_STREAM(NULL, _usart_getchar, _FDEV_SETUP_READ);
 
 void usart_init() {
-    // Set baud rate
-    UBRRH = UBRRH_VALUE;
-    UBRRL = UBRRL_VALUE;
-    // Enable receiver and transmitter
-    UCSRB = (1<<RXEN)|(1<<TXEN);
-    // Set frame format: 8data, 1stop bit, parity bit disables
-    UCSRC = (1<<URSEL)|(1<<UCSZ0)|(1<<UCSZ1);
+  // Set baud rate
+  UBRR0H = UBRRH_VALUE;
+  UBRR0L = UBRRL_VALUE;
+  // Enable receiver and transmitter
+  UCSR0B = (1<<RXEN0)|(1<<TXEN0);
+  // Set frame format: 8data, 1stop bit, parity bit disables
+  UCSR0C = (1<<UCSZ00)|(1<<UCSZ01);
 
-    // bind stdin and stdout to usart
-    stdout = &usart_output;
-	stdin = &usart_input;
+  // bind stdin and stdout to usart
+  stdout = &usart_output;
+  stdin = &usart_input;
 }
 void _usart_putchar(char data, FILE* stream) {
-    while ( !(UCSRA & (1<<UDRE)) );	// Wait for empty transmit buffer
-    UDR = data; 						// Start transmission
+  while ( !(UCSR0A & (1<<UDRE0)) );	// Wait for empty transmit buffer
+  UDR0 = data; 						// Start transmission
 }
 char _usart_getchar(FILE* stream) {
-    while ( !(UCSRA & (1<<RXC)) );	// Wait for incoming data
-    return UDR;							// Return the data
+  while ( !(UCSR0A & (1<<RXC0)) );	// Wait for incoming data
+  return UDR0;							// Return the data
 }
 
 #endif

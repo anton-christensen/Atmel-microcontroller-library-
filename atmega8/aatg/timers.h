@@ -131,17 +131,14 @@ unsigned int duty_cycle_10bit(int percentage); 	// maps 0-100 to 0x00-0x3FF
 unsigned int duty_cycle_16bit(int percentage); 	// maps 0-100 to 0x00-0xFFFF
 
 // shorthand initializers
-void timer0_init(int wave_mode, int oc_mode, int clock_mode);
 void timer1_init(int wave16_mode, int ocA16_mode, int ocB16_mode, int clock_mode);
 void timer2_init(int wave_mode, int oc_mode, int clock_mode);
 
 // waveform generator mode setters
-void timer0_set_wave_mode(int wave_mode);
 void timer1_set_wave_mode(int wave16_mode);
 void timer2_set_wave_mode(int wave_mode);
 
 // output compare mode setters
-void timer0_set_output_compare_mode(int oc_mode);
 void timer1_set_output_compareA_mode(int ocA16_mode);
 void timer1_set_output_compareB_mode(int ocB16_mode);
 void timer2_set_output_compare_mode(int oc_mode);
@@ -152,13 +149,11 @@ void timer1_set_clock_mode(int clock_mode);
 void timer2_set_clock_mode(int clock_mode);
 
 // output compare register value setters
-void timer0_set_output_compare_register(unsigned int oc_value);
 void timer1_set_output_compare_registerA(unsigned int oc_value);
 void timer1_set_output_compare_registerB(unsigned int oc_value);
 void timer2_set_output_compare_register(int oc_value);
 
 // force output compare functions
-void timer0_force_output_compare();  // Forces a compare match state, where waveform and OC will update. read more in ATMega16 Datasheet page 83. DO NOT USE IN PWM MODES!
 void timer1A_force_output_compare(); // Forces a compare match state, where waveform and OC will update. read more in ATMega16 Datasheet page 83. DO NOT USE IN PWM MODES!
 void timer1B_force_output_compare(); // Forces a compare match state, where waveform and OC will update. read more in ATMega16 Datasheet page 83. DO NOT USE IN PWM MODES!
 void timer2_force_output_compare();  // Forces a compare match state, where waveform and OC will update. read more in ATMega16 Datasheet page 83. DO NOT USE IN PWM MODES!
@@ -202,11 +197,6 @@ unsigned int duty_cycle_9bit(int percentage)  { return (0x1FF *(long)percentage)
 unsigned int duty_cycle_10bit(int percentage) { return (0x3FF *(long)percentage)/100; }
 unsigned int duty_cycle_16bit(int percentage) { return (0xFFFF*(long)percentage)/100; }
 
-void timer0_init(int wave_mode, int oc_mode, int clock_mode) {
-	timer0_set_wave_mode(wave_mode);
-	timer0_set_output_compare_mode(oc_mode);
-	timer0_set_clock_mode(clock_mode);
-}
 void timer1_init(int wave16_mode, int ocA16_mode, int ocB16_mode, int clock_mode) {
 	timer1_set_wave_mode(wave16_mode);
 	timer1_set_output_compareA_mode(ocA16_mode);
@@ -220,24 +210,6 @@ void timer2_init(int wave_mode, int oc_mode, int clock_mode) {
 }
 
 
-void timer0_set_wave_mode(int wave_mode) {
-	switch(wave_mode) {
-		case NORMAL_MODE:
-			TCCR0 &= ~(1<<WGM01 | 1<<WGM00);
-			break;
-		case PWM_PHASE_CORRECT:
-			TCCR0 &= ~(1<<WGM01);
-			TCCR0 |=   1<<WGM00;
-			break;
-		case CLEAR_ON_COMPARE:
-			TCCR0 |=   1<<WGM01;
-			TCCR0 &= ~(1<<WGM00);
-			break;
-		case PWM_FAST:
-			TCCR0 |=   1<<WGM01 | 1<<WGM00;
-			break;
-	}
-}
 void timer1_set_wave_mode(int wave16_mode) {
 	switch(wave16_mode) {
 		case NORMAL16_MODE: 				TCCR1B &= ~(1<<WGM13 | 1<<WGM12); TCCR1A &= ~(1<<WGM11 | 1<<WGM10); break; 
@@ -278,24 +250,6 @@ void timer2_set_wave_mode(int wave_mode) {
 }
 
 
-void timer0_set_output_compare_mode(int oc_mode) {
-	switch(oc_mode%4) {
-		case NON_PWM_NORMAL:
-			TCCR0 &= ~(1<<COM01 | 1<<COM00);
-			break;
-		case NON_PWM_OC_TOGGLE:
-			TCCR0 &= ~(1<<COM01);
-			TCCR0 |=   1<<COM00;
-			break;
-		case NON_PWM_OC_CLEAR:
-			TCCR0 |=   1<<COM01;
-			TCCR0 &= ~(1<<COM00);
-			break;
-		case NON_PWM_OC_SET:
-			TCCR0 |=   1<<COM01 | 1<<COM00;
-			break;
-	}
-}
 void timer1_set_output_compareA_mode(int ocA16_mode) {
 	switch(ocA16_mode%4) {
 		case NON_PWM16_NORMAL: 		TCCR1A &= ~(1<<COM1A1 | 1<<COM1A0); break;
@@ -352,7 +306,6 @@ void timer2_set_clock_mode(int clock_mode) {
 }
 
 
-void timer0_set_output_compare_register(unsigned int oc_value) {OCR0 = oc_value;}
 void timer1_set_output_compare_registerA(unsigned int oc_value) {
 	// turn off interrupts while doing 16 bit read
 	unsigned int sreg;
@@ -372,7 +325,6 @@ void timer1_set_output_compare_registerB(unsigned int oc_value) {
 void timer2_set_output_compare_register(int oc_value) {OCR2 = oc_value;}
 
 
-void timer0_force_output_compare() { TCCR0 |= 1<<FOC0; }
 void timer1A_force_output_compare() { TCCR1A |= 1<<FOC1A; }
 void timer1B_force_output_compare() { TCCR1A |= 1<<FOC1B; }
 void timer2_force_output_compare() { TCCR2 |= 1<<FOC2; }

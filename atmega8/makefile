@@ -2,13 +2,19 @@ EDITOR=nano
 
 BAUDRATE=115200
 SRC=main
-AVR_TYPE=atmega16
-AVR_DEVICE=m16
+AVR_TYPE=atmega8
+AVR_DEVICE=m8
 AVR_FREQ=16000000UL
-PROGRAMMER=avr910
+PROGRAMMER=usbasp #avr910
 DEVICE=/dev/ttyACM0 #COM3
 CC = avr-gcc
 CFLAGS=-g -DF_CPU=$(AVR_FREQ) -funsigned-char -Os -Werror -Wextra -lm
+
+ifeq ($(OS),Windows_NT)
+	# Windows stuff
+else
+    SUDO=sudo
+endif
 
 all: object elf hex flash clean
 
@@ -34,4 +40,4 @@ hex: elf
 	avr-objcopy -j .text -j .data -O ihex $(SRC).elf $(SRC).hex	
 
 flash: hex
-	sudo avrdude -F -e -b $(BAUDRATE) -c $(PROGRAMMER) -p $(AVR_DEVICE) -P $(DEVICE) -U flash:w:$(SRC).hex
+	$(SUDO) avrdude -F -e -b $(BAUDRATE) -c $(PROGRAMMER) -p $(AVR_DEVICE) -P $(DEVICE) -U flash:w:$(SRC).hex

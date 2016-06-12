@@ -8,6 +8,8 @@ int  norm(int n);						// returns input normalized
 void delay_ms(unsigned long long n); 	// same as _delay_ms but accepts non constant input
 void delay_us(unsigned long long n); 	// same as _delay_us but accepts non constant input
 
+long int linInterp(int t, long int min, long int max) {return (t*(max-min))/100 + min;}
+
 // normalize
 int norm(int n) { return n < 0 ? -n : n; }
 

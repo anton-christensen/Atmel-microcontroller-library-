@@ -43,7 +43,7 @@ unsigned int adc_read(char pin_select) {
 	pin_select %= 8;
 	ADMUX &= 0b11100000; 				// Clear the pin select register 
 	ADMUX |= pin_select; 				// Set pin to read from (single ended mode) 
-	_delay_us(100); 						// Delay needed for the stabilization of the ADC input voltage
+	// _delay_us(100); 						// Delay needed for the stabilization of the ADC input voltage
 	ADCSRA|=(1<<ADSC); 					// Initiates the conversion of selected AD pin
 	while ((ADCSRA & (1<<ADIF)) == 0); 	// Wait for the AD conversion to complete
 	ADCSRA|=(1<<ADIF);					// Clears pending interrupt               
